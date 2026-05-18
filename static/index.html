@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>日本麻将快速算分</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>日本麻将快速算分</h1>
+          <p id="statusText">手牌 0/14 · 副露 0 · 未选和牌</p>
+        </div>
+        <div class="top-actions">
+          <button id="undoBtn" class="ghost">撤销</button>
+          <button id="clearBtn" class="ghost">清空</button>
+        </div>
+      </header>
+
+      <section class="panel hand-panel">
+        <div class="section-title">
+          <h2>当前手牌</h2>
+          <span class="hint">点击手牌可删除，计算时选择和牌</span>
+        </div>
+        <div id="handTiles" class="selected-tiles empty">点击下方牌图添加手牌</div>
+      </section>
+
+      <section class="panel meld-panel">
+        <div class="section-title">
+          <h2>副露</h2>
+        </div>
+        <div id="meldHint" class="hint">切到副露后点 3 张自动识别吃/碰；点 4 张相同牌时选择杠类型。</div>
+        <div id="melds" class="melds empty">暂无副露</div>
+      </section>
+
+      <section class="panel compact">
+        <details open>
+          <summary>场况与宝牌</summary>
+          <div class="settings">
+            <div class="field">
+              <span>和牌方式</span>
+              <div class="segmented">
+                <button data-bind="round.isTsumo" data-value="false">荣和</button>
+                <button data-bind="round.isTsumo" data-value="true">自摸</button>
+              </div>
+            </div>
+            <label class="switch"><span>庄家</span><input id="isDealer" type="checkbox" /></label>
+            <div class="field">
+              <span>场风</span>
+              <div class="segmented wind-tabs" data-wind="roundWind">
+                <button data-value="east">东</button>
+                <button data-value="south">南</button>
+                <button data-value="west">西</button>
+                <button data-value="north">北</button>
+              </div>
+            </div>
+            <div class="field">
+              <span>自风</span>
+              <div class="segmented wind-tabs" data-wind="playerWind">
+                <button data-value="east">东</button>
+                <button data-value="south">南</button>
+                <button data-value="west">西</button>
+                <button data-value="north">北</button>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="stepper">
+                <span>本场数</span>
+                <button data-step="honba" data-delta="-1">-</button>
+                <strong id="honbaValue">0</strong>
+                <button data-step="honba" data-delta="1">+</button>
+              </div>
+              <div class="stepper">
+                <span>供托</span>
+                <button data-step="riichiSticks" data-delta="-1">-</button>
+                <strong id="riichiSticksValue">0</strong>
+                <button data-step="riichiSticks" data-delta="1">+</button>
+              </div>
+            </div>
+            <div id="flagGrid" class="flag-grid"></div>
+            <div class="dora-row">
+              <div>
+                <h3>宝牌指示牌</h3>
+                <div id="doraTiles" class="mini-tiles empty">暂无</div>
+              </div>
+              <div>
+                <h3>里宝牌指示牌</h3>
+                <div id="uraTiles" class="mini-tiles empty">暂无</div>
+              </div>
+            </div>
+            <label class="switch"><span>食断</span><input id="hasOpenTanyao" type="checkbox" checked /></label>
+            <label class="switch"><span>红宝牌</span><input id="hasAkaDora" type="checkbox" checked /></label>
+          </div>
+        </details>
+      </section>
+
+      <section id="result" class="panel result-panel empty">结果将在这里显示</section>
+
+      <section class="picker">
+        <div class="segmented target-tabs picker-targets">
+          <button data-target="hand">手牌</button>
+          <button data-target="meld">副露</button>
+          <button data-target="dora">宝牌</button>
+          <button data-target="ura">里宝牌</button>
+        </div>
+        <div id="tilePicker"></div>
+        <div class="picker-actions">
+          <button id="togglePickerBtn" class="ghost" type="button">收起</button>
+          <button id="calculateBtn" class="primary">计算</button>
+        </div>
+      </section>
+
+      <dialog id="choiceDialog" class="choice-dialog">
+        <form method="dialog">
+          <h2 id="choiceTitle">选择</h2>
+          <div id="choiceBody" class="choice-body"></div>
+          <div class="dialog-actions">
+            <button value="cancel" class="ghost">取消</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
