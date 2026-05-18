@@ -225,6 +225,44 @@ h3 {
   color: var(--accent);
 }
 
+.calc-memory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  min-height: 34px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.memory-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 5px 6px 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.memory-label {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.memory-item .tile {
+  width: 30px;
+  height: 40px;
+}
+
+.memory-item button:not(.tile) {
+  min-height: 32px;
+  padding: 0 9px;
+}
+
 .meld-upgrade {
   border-color: var(--accent);
   color: var(--accent);
@@ -270,7 +308,7 @@ details summary {
 }
 
 .step-row {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 
 .stepper {

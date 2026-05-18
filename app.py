@@ -136,7 +136,6 @@ def estimate(data: dict[str, Any]) -> dict[str, Any]:
         is_renhou=bool(flags.get("isRenhou")),
         player_wind=player_wind,
         round_wind=WINDS.get(round_info.get("roundWind"), EAST),
-        kyoutaku_number=int(round_info.get("riichiSticks") or 0),
         tsumi_number=int(round_info.get("honba") or 0),
         options=OptionalRules(
             has_open_tanyao=bool(options.get("hasOpenTanyao", True)),
@@ -163,10 +162,7 @@ def estimate(data: dict[str, Any]) -> dict[str, Any]:
     if manual_dora_total and not dora_indicators and not ura_dora_indicators and not has_yakuman:
         han += manual_dora_total
         cost = ScoresCalculator.calculate_scores(han, result.fu, config)
-        if manual_dora_count:
-            yaku.append(f"宝牌 {manual_dora_count}")
-        if manual_ura_dora_count:
-            yaku.append(f"里宝牌 {manual_ura_dora_count}")
+        yaku.append(f"宝牌/里宝牌 {manual_dora_total}")
 
     return {
         "ok": True,
