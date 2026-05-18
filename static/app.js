@@ -106,12 +106,11 @@ const state = {
     playerWind: "south",
     roundWind: "east",
     honba: 0,
-    riichiSticks: 0,
   },
   flags: Object.fromEntries(Object.keys(flagLabels).map((key) => [key, false])),
   doraIndicators: [],
   uraDoraIndicators: [],
-  manualDoraCount: 0,
+  manualDoraCount: null,
   manualUraDoraCount: 0,
   options: {
     hasOpenTanyao: true,
@@ -223,6 +222,7 @@ function render() {
   state.closedTiles.sort((a, b) => tileSortValue(a) - tileSortValue(b));
   renderHand();
   renderMelds();
+  renderCalcMemory();
   renderIndicators("doraTiles", state.doraIndicators);
   renderIndicators("uraTiles", state.uraDoraIndicators);
   renderFlags();
@@ -239,7 +239,8 @@ function renderHand() {
     return;
   }
   state.closedTiles.forEach((tile, index) => {
-    const button = tileButton(tile, () => removeClosedTile(index));
+    const className = state.winTile === tile ? "win" : "";
+    const button = tileButton(tile, () => removeClosedTile(index), className);
     container.append(button);
   });
 }
@@ -306,6 +307,58 @@ function renderMelds() {
   });
 }
 
+function renderCalcMemory() {
+  const container = $("calcMemory");
+  container.innerHTML = "";
+  const winTile = getStoredWinTile();
+  const manualDoraTotal = getManualDoraTotal();
+  const hasManualDoraTotal = shouldUseManualDoraTotal();
+  container.classList.toggle("empty", !winTile && !hasManualDoraTotal);
+
+  if (!winTile && !hasManualDoraTotal) {
+    container.textContent = "和牌与宝牌数量会在第一次计算后保留";
+    return;
+  }
+
+  if (winTile) {
+    container.append(createMemoryItem("和牌", winTile, () => {
+      pushHistory();
+      state.winTile = null;
+      render();
+    }, true));
+  }
+
+  if (hasManualDoraTotal) {
+    container.append(createMemoryItem("宝牌总数", `${manualDoraTotal} 张`, () => {
+      pushHistory();
+      clearManualDoraTotal();
+      render();
+    }));
+  }
+}
+
+function createMemoryItem(label, value, onRemove, isTile = false) {
+  const item = document.createElement("div");
+  item.className = "memory-item";
+  const text = document.createElement("span");
+  text.className = "memory-label";
+  text.textContent = label;
+  item.append(text);
+  if (isTile) {
+    item.append(tileButton(value, () => {}, "win"));
+  } else {
+    const strong = document.createElement("strong");
+    strong.textContent = value;
+    item.append(strong);
+  }
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "删";
+  remove.addEventListener("click", onRemove);
+  item.append(remove);
+  return item;
+}
+
 function renderIndicators(id, tiles) {
   const container = $(id);
   container.innerHTML = "";
@@ -332,7 +385,6 @@ function updateControls() {
   togglePickerBtn.setAttribute("aria-expanded", String(!isPickerCollapsed));
   $("isDealer").checked = state.round.isDealer;
   $("honbaValue").textContent = state.round.honba;
-  $("riichiSticksValue").textContent = state.round.riichiSticks;
   $("hasOpenTanyao").checked = state.options.hasOpenTanyao;
   $("hasAkaDora").checked = state.options.hasAkaDora;
   document.querySelectorAll("[data-target]").forEach((button) => {
@@ -355,9 +407,11 @@ function updateControls() {
 
 function updateStatus() {
   const targetCount = targetClosedTileCount();
+  const winTile = getStoredWinTile();
+  const doraText = shouldUseManualDoraTotal() ? ` · 宝牌总数 ${getManualDoraTotal()}` : "";
   const status = `手牌 ${state.closedTiles.length}/${targetCount} · 副露 ${state.melds.length} · ${
-    state.winTile ? `上次和牌 ${state.winTile}` : "计算时选择和牌"
-  }`;
+    winTile ? `和牌 ${winTile}` : "计算时选择和牌"
+  }${doraText}`;
   $("statusText").textContent = status;
 }
 
@@ -379,8 +433,10 @@ function handleTilePick(tile) {
   pushHistory();
   if (inputTarget === "dora") {
     state.doraIndicators.push(tile);
+    clearManualDoraTotal();
   } else if (inputTarget === "ura") {
     state.uraDoraIndicators.push(tile);
+    clearManualDoraTotal();
   } else if (canAdd(tile)) {
     state.closedTiles.push(tile);
     if (state.closedTiles.length >= targetClosedTileCount()) {
@@ -504,6 +560,8 @@ function chooseKanType() {
 }
 
 function chooseWinTile() {
+  const stored = getStoredWinTile();
+  if (stored) return Promise.resolve(stored);
   const choices = [...state.closedTiles]
     .sort((a, b) => tileSortValue(a) - tileSortValue(b))
     .map((tile) => ({ value: tile, tile }));
@@ -511,18 +569,35 @@ function chooseWinTile() {
 }
 
 function shouldAskManualDoraCounts() {
-  return state.doraIndicators.length === 0 && state.uraDoraIndicators.length === 0;
+  return state.doraIndicators.length === 0
+    && state.uraDoraIndicators.length === 0
+    && !shouldUseManualDoraTotal();
 }
 
 async function chooseManualDoraCounts() {
-  const doraCount = await showCountChoice("选择宝牌数量");
-  if (doraCount === null) return null;
-  let uraDoraCount = 0;
-  if (state.flags.isRiichi || state.flags.isDoubleRiichi) {
-    uraDoraCount = await showCountChoice("选择里宝牌数量");
-    if (uraDoraCount === null) return null;
-  }
-  return { doraCount, uraDoraCount };
+  const total = await showCountChoice("选择宝牌总数量");
+  if (total === null) return null;
+  return { doraCount: total, uraDoraCount: 0 };
+}
+
+function getStoredWinTile() {
+  return state.winTile && state.closedTiles.includes(state.winTile) ? state.winTile : null;
+}
+
+function getManualDoraTotal() {
+  return Number(state.manualDoraCount || 0) + Number(state.manualUraDoraCount || 0);
+}
+
+function shouldUseManualDoraTotal() {
+  return state.manualDoraCount !== null
+    && state.manualDoraCount !== undefined
+    && state.doraIndicators.length === 0
+    && state.uraDoraIndicators.length === 0;
+}
+
+function clearManualDoraTotal() {
+  state.manualDoraCount = null;
+  state.manualUraDoraCount = 0;
 }
 
 function showChoice(title, choices) {
@@ -564,7 +639,7 @@ function showCountChoice(title) {
   body.classList.add("count-choice-body");
   const note = document.createElement("p");
   note.className = "count-choice-note";
-  note.textContent = "未选择指示牌时，用这里直接输入实际宝牌数量。常见范围已放在前排，点一下即可继续。";
+  note.textContent = "未选择指示牌时，直接输入宝牌加里宝牌的总数量。选过后会保留，删除后可重选。";
   const row = document.createElement("div");
   row.className = "count-choice-row";
   choices.forEach((choice) => {
@@ -629,14 +704,18 @@ async function calculate() {
   }
   const winTile = await chooseWinTile();
   if (!winTile) return;
-  const manualCounts = shouldAskManualDoraCounts()
-    ? await chooseManualDoraCounts()
-    : { doraCount: 0, uraDoraCount: 0 };
-  if (!manualCounts) return;
+  let manualCounts = null;
+  if (shouldAskManualDoraCounts()) {
+    manualCounts = await chooseManualDoraCounts();
+    if (!manualCounts) return;
+  }
   pushHistory();
   state.winTile = winTile;
-  state.manualDoraCount = manualCounts.doraCount;
-  state.manualUraDoraCount = manualCounts.uraDoraCount;
+  if (manualCounts) {
+    state.manualDoraCount = manualCounts.doraCount;
+    state.manualUraDoraCount = manualCounts.uraDoraCount;
+  }
+  render();
   const result = $("result");
   result.className = "panel result-panel";
   result.textContent = "计算中...";
@@ -669,11 +748,13 @@ function renderResult(data) {
   }
   const cost = data.cost || {};
   const isTsumo = state.round.isTsumo;
+  const mainPayment = (cost.main || 0) + (cost.main_bonus || 0);
+  const additionalPayment = (cost.additional || 0) + (cost.additional_bonus || 0);
   const costText = isTsumo
     ? state.round.isDealer
-      ? `自摸 每家 ${cost.main || 0} 点`
-      : `自摸 亲 ${cost.main || 0} 点 / 子 ${cost.additional || 0} 点`
-    : `荣和 ${cost.main || 0} 点`;
+      ? `自摸 每家 ${mainPayment} 点`
+      : `自摸 亲 ${mainPayment} 点 / 子 ${additionalPayment} 点`
+    : `荣和 ${mainPayment} 点`;
   result.className = "panel result-panel";
   result.innerHTML = `
     <strong>${costText}</strong>
@@ -718,7 +799,7 @@ function bindEvents() {
     state.melds = [];
     state.doraIndicators = [];
     state.uraDoraIndicators = [];
-    state.manualDoraCount = 0;
+    state.manualDoraCount = null;
     state.manualUraDoraCount = 0;
     meldBuffer = [];
     render();
