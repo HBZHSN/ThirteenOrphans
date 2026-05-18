@@ -1,0 +1,527 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f7f4;
+  --panel: #ffffff;
+  --ink: #20231f;
+  --muted: #697067;
+  --line: #dce1d8;
+  --accent: #0c7b72;
+  --accent-2: #c84630;
+  --soft: #edf5f2;
+  --warn: #fff1dc;
+  --picker-height: 238px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+button,
+select {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+button {
+  padding: 0 12px;
+  font-weight: 650;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 12px 12px calc(var(--picker-height) + 20px + env(safe-area-inset-bottom));
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 10px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.topbar p,
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ghost {
+  background: transparent;
+}
+
+.primary {
+  width: 100%;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+}
+
+.mode-btn.active,
+.meld-tools button.active,
+.segmented button.active,
+.target-tabs button.active,
+.wind-tabs button.active {
+  border-color: var(--accent);
+  background: var(--soft);
+  color: var(--accent);
+}
+
+.selected-tiles,
+.melds,
+.mini-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 50px;
+  align-items: center;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.tile {
+  position: relative;
+  width: 38px;
+  height: 51px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex: 0 0 auto;
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.tile.win::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 3px solid var(--accent-2);
+  border-radius: 7px;
+  pointer-events: none;
+}
+
+.tile .badge {
+  position: absolute;
+  right: -4px;
+  top: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--accent-2);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.meld-tools,
+.step-row,
+.flag-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.meld-tools button {
+  padding: 0 4px;
+}
+
+.meld-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.meld-card.pending {
+  border-style: dashed;
+  background: var(--soft);
+}
+
+.meld-label {
+  min-width: 42px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.meld-upgrade {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+details summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 750;
+}
+
+.settings {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.field,
+.switch,
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 160px;
+}
+
+.target-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: min(420px, 100%);
+}
+
+.wind-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 220px;
+}
+
+.step-row {
+  grid-template-columns: 1fr 1fr;
+}
+
+.stepper {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.stepper button {
+  width: 44px;
+  padding: 0;
+}
+
+.flag-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.flag {
+  min-height: 44px;
+  padding: 0 8px;
+}
+
+.flag.active {
+  border-color: var(--accent);
+  background: var(--soft);
+  color: var(--accent);
+}
+
+.flag:disabled {
+  opacity: 0.45;
+}
+
+.dora-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.choice-dialog {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+  width: min(420px, calc(100% - 32px));
+  box-shadow: 0 18px 48px rgba(32, 35, 31, 0.18);
+}
+
+.choice-dialog::backdrop {
+  background: rgba(24, 31, 29, 0.36);
+}
+
+.choice-dialog form {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.choice-dialog h2 {
+  font-size: 18px;
+}
+
+.choice-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice-body.count-choice-body {
+  display: grid;
+  gap: 12px;
+}
+
+.count-choice-note {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.choice-body > button:not(.tile) {
+  flex: 1 1 110px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.count-choice-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.count-choice {
+  min-height: 46px;
+  padding: 0;
+  border-radius: 8px;
+  background: var(--soft);
+  font-size: 17px;
+}
+
+.count-choice:hover,
+.count-choice:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.count-choice.recommended {
+  border-color: rgba(12, 123, 114, 0.35);
+  background: #fff;
+}
+
+.choice-dialog.count-dialog .dialog-actions {
+  padding-top: 2px;
+  border-top: 1px solid var(--line);
+}
+
+.mini-tiles .tile {
+  width: 30px;
+  height: 40px;
+}
+
+.result-panel strong {
+  font-size: 24px;
+}
+
+.result-panel ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.result-error {
+  background: var(--warn);
+  border-color: #e6c48d;
+}
+
+.picker {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(760px, 100%);
+  background: rgba(246, 247, 244, 0.96);
+  border-top: 1px solid var(--line);
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+  backdrop-filter: blur(8px);
+}
+
+.picker-targets {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 8px;
+  min-width: 0;
+}
+
+#tilePicker {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.picker-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.picker-row span {
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.picker-tiles {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+  min-width: 0;
+  padding-bottom: 2px;
+}
+
+.picker .tile {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 34 / 46;
+}
+
+.picker-row:last-child .picker-tiles {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.picker-actions {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.picker.collapsed .picker-targets,
+.picker.collapsed #tilePicker {
+  display: none;
+}
+
+@media (min-width: 560px) {
+  .tile {
+    width: 43px;
+    height: 58px;
+  }
+
+  .picker .tile {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .top-actions button {
+    flex: 1;
+  }
+
+  .meld-tools,
+  .flag-grid,
+  .target-tabs,
+  .wind-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .section-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .field {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .field > .segmented,
+  .wind-tabs {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .count-choice-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
