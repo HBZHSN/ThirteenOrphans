@@ -26,6 +26,23 @@ const meldLabels = {
   shouminkan: "加杠",
 };
 
+const suitLabels = {
+  m: "万",
+  p: "筒",
+  s: "索",
+  z: "字",
+};
+
+const honorLabels = {
+  "1z": "东",
+  "2z": "南",
+  "3z": "西",
+  "4z": "北",
+  "5z": "白",
+  "6z": "发",
+  "7z": "中",
+};
+
 const yakuTranslations = {
   "Menzen Tsumo": "门前清自摸和",
   "Riichi": "立直",
@@ -180,9 +197,16 @@ function tileButton(tile, onClick, className = "") {
   button.className = `tile ${className}`;
   button.type = "button";
   button.dataset.tile = tile;
-  button.innerHTML = `<img src="/img/${tile}.png" alt="${tile}" />`;
+  button.setAttribute("aria-label", tileLabel(tile));
+  button.innerHTML = `<img src="/img/${tile}.png" alt="${tileLabel(tile)}" />`;
   button.addEventListener("click", onClick);
   return button;
+}
+
+function tileLabel(tile) {
+  if (honorLabels[tile]) return honorLabels[tile];
+  const number = tile[0] === "0" ? "红五" : tile[0];
+  return `${number}${suitLabels[tile[1]] || ""}`;
 }
 
 function renderPicker() {
@@ -696,6 +720,18 @@ function showError(message) {
   result.textContent = message;
 }
 
+function resetResult() {
+  const result = $("result");
+  result.className = "panel result-panel empty";
+  result.innerHTML = `
+    <div class="empty-state">
+      <p class="section-kicker">Result</p>
+      <strong>结果将在这里显示</strong>
+      <span>录入手牌后点击底部“计算”。</span>
+    </div>
+  `;
+}
+
 async function calculate() {
   setPickerCollapsed(true);
   if (!state.closedTiles.length) {
@@ -802,6 +838,7 @@ function bindEvents() {
     state.manualDoraCount = null;
     state.manualUraDoraCount = 0;
     meldBuffer = [];
+    resetResult();
     render();
   });
   $("calculateBtn").addEventListener("click", calculate);

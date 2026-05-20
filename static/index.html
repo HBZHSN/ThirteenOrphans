@@ -7,91 +7,115 @@
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
+    <a class="skip-link" href="#tilePicker">跳到牌盘</a>
     <main class="app">
       <header class="topbar">
-        <div>
-          <h1>日本麻将快速算分</h1>
-          <p id="statusText">手牌 0/14 · 副露 0 · 未选和牌</p>
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">十</div>
+          <div>
+            <p class="eyebrow">Riichi Calculator</p>
+            <h1>日本麻将快速算分</h1>
+          </div>
         </div>
-        <div class="top-actions">
-          <button id="undoBtn" class="ghost">撤销</button>
-          <button id="clearBtn" class="ghost">清空</button>
-        </div>
+        <p id="statusText" class="status-pill">手牌 0/14 · 副露 0 · 未选和牌</p>
       </header>
 
-      <section class="panel hand-panel">
-        <div class="section-title">
-          <h2>当前手牌</h2>
-          <span class="hint">点击手牌可删除，计算时选择和牌</span>
-        </div>
-        <div id="handTiles" class="selected-tiles empty">点击下方牌图添加手牌</div>
-      </section>
-
-      <section class="panel meld-panel">
-        <div class="section-title">
-          <h2>副露</h2>
-        </div>
-        <div id="meldHint" class="hint">切到副露后点 3 张自动识别吃/碰；点 4 张相同牌时选择杠类型。</div>
-        <div id="melds" class="melds empty">暂无副露</div>
-        <div id="calcMemory" class="calc-memory"></div>
-      </section>
-
-      <section class="panel compact">
-        <details open>
-          <summary>场况与宝牌</summary>
-          <div class="settings">
-            <div class="field">
-              <span>和牌方式</span>
-              <div class="segmented">
-                <button data-bind="round.isTsumo" data-value="false">荣和</button>
-                <button data-bind="round.isTsumo" data-value="true">自摸</button>
-              </div>
-            </div>
-            <label class="switch"><span>庄家</span><input id="isDealer" type="checkbox" /></label>
-            <div class="field">
-              <span>场风</span>
-              <div class="segmented wind-tabs" data-wind="roundWind">
-                <button data-value="east">东</button>
-                <button data-value="south">南</button>
-                <button data-value="west">西</button>
-                <button data-value="north">北</button>
-              </div>
-            </div>
-            <div class="field">
-              <span>自风</span>
-              <div class="segmented wind-tabs" data-wind="playerWind">
-                <button data-value="east">东</button>
-                <button data-value="south">南</button>
-                <button data-value="west">西</button>
-                <button data-value="north">北</button>
-              </div>
-            </div>
-            <div class="step-row">
-              <div class="stepper">
-                <span>本场数</span>
-                <button data-step="honba" data-delta="-1">-</button>
-                <strong id="honbaValue">0</strong>
-                <button data-step="honba" data-delta="1">+</button>
-              </div>
-            </div>
-            <div id="flagGrid" class="flag-grid"></div>
-            <div class="dora-row">
+      <div class="workspace">
+        <div class="main-column">
+          <section class="panel hand-panel">
+            <div class="section-title">
               <div>
+                <p class="section-kicker">Hand</p>
+                <h2>当前手牌</h2>
+              </div>
+              <span class="hint">点击手牌可删除，计算时选择和牌</span>
+            </div>
+            <div id="handTiles" class="selected-tiles empty">点击下方牌图添加手牌</div>
+          </section>
+
+          <section class="panel meld-panel">
+            <div class="section-title">
+              <div>
+                <p class="section-kicker">Melds</p>
+                <h2>副露</h2>
+              </div>
+              <span id="meldHint" class="hint">切到副露后点 3 张自动识别吃/碰；点 4 张相同牌时选择杠类型。</span>
+            </div>
+            <div id="melds" class="melds empty">暂无副露</div>
+            <div id="calcMemory" class="calc-memory"></div>
+            <div class="dora-row meld-dora-row">
+              <div class="dora-box">
                 <h3>宝牌指示牌</h3>
                 <div id="doraTiles" class="mini-tiles empty">暂无</div>
               </div>
-              <div>
+              <div class="dora-box">
                 <h3>里宝牌指示牌</h3>
                 <div id="uraTiles" class="mini-tiles empty">暂无</div>
               </div>
             </div>
-            <label class="switch"><span>食断</span><input id="hasOpenTanyao" type="checkbox" checked /></label>
-            <label class="switch"><span>红宝牌</span><input id="hasAkaDora" type="checkbox" checked /></label>
-          </div>
-        </details>
-      </section>
+          </section>
 
-      <section id="result" class="panel result-panel empty">结果将在这里显示</section>
+          <section id="result" class="panel result-panel empty">
+            <div class="empty-state">
+              <p class="section-kicker">Result</p>
+              <strong>结果将在这里显示</strong>
+              <span>录入手牌后点击底部“计算”。</span>
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <section class="panel compact settings-panel">
+            <details open>
+              <summary>
+                <span>场况</span>
+                <small>Round</small>
+              </summary>
+              <div class="settings">
+                <div class="field">
+                  <span>和牌方式</span>
+                  <div class="segmented">
+                    <button data-bind="round.isTsumo" data-value="false">荣和</button>
+                    <button data-bind="round.isTsumo" data-value="true">自摸</button>
+                  </div>
+                </div>
+                <label class="switch"><span>庄家</span><input id="isDealer" type="checkbox" /></label>
+                <div class="field">
+                  <span>场风</span>
+                  <div class="segmented wind-tabs" data-wind="roundWind">
+                    <button data-value="east">东</button>
+                    <button data-value="south">南</button>
+                    <button data-value="west">西</button>
+                    <button data-value="north">北</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <span>自风</span>
+                  <div class="segmented wind-tabs" data-wind="playerWind">
+                    <button data-value="east">东</button>
+                    <button data-value="south">南</button>
+                    <button data-value="west">西</button>
+                    <button data-value="north">北</button>
+                  </div>
+                </div>
+                <div class="step-row">
+                  <div class="stepper">
+                    <span>本场数</span>
+                    <button data-step="honba" data-delta="-1">-</button>
+                    <strong id="honbaValue">0</strong>
+                    <button data-step="honba" data-delta="1">+</button>
+                  </div>
+                </div>
+                <div id="flagGrid" class="flag-grid"></div>
+                <div class="option-row">
+                  <label class="switch"><span>食断</span><input id="hasOpenTanyao" type="checkbox" checked /></label>
+                  <label class="switch"><span>红宝牌</span><input id="hasAkaDora" type="checkbox" checked /></label>
+                </div>
+              </div>
+            </details>
+          </section>
+        </aside>
+      </div>
 
       <section class="picker">
         <div class="segmented target-tabs picker-targets">
@@ -102,7 +126,24 @@
         </div>
         <div id="tilePicker"></div>
         <div class="picker-actions">
-          <button id="togglePickerBtn" class="ghost" type="button">收起</button>
+          <button id="togglePickerBtn" class="ghost" type="button" aria-expanded="true">收起</button>
+          <button id="undoBtn" class="ghost icon-button" type="button" aria-label="撤销">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 7H5v4" />
+              <path d="M5 11a7 7 0 1 0 2.05-4.95L5 8.1" />
+            </svg>
+            <span>撤销</span>
+          </button>
+          <button id="clearBtn" class="ghost icon-button" type="button" aria-label="清空">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18" />
+              <path d="M8 6V4h8v2" />
+              <path d="M6 6l1 15h10l1-15" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+            </svg>
+            <span>清空</span>
+          </button>
           <button id="calculateBtn" class="primary">计算</button>
         </div>
       </section>
