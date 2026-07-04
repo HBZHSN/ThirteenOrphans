@@ -17,10 +17,41 @@
             <h1>日本麻将快速算分</h1>
           </div>
         </div>
+        <div class="segmented mode-tabs" aria-label="模式">
+          <button id="modeScoreBtn" type="button">算分</button>
+          <button id="modeGameBtn" type="button">对局</button>
+        </div>
         <p id="statusText" class="status-pill">手牌 0/14 · 副露 0 · 未选和牌</p>
       </header>
 
-      <div class="workspace">
+      <section id="gameMode" class="game-view" hidden>
+        <section id="roomLobbyPanel" class="panel room-panel">
+          <div class="section-title">
+            <div>
+              <p class="section-kicker">Rooms</p>
+              <h2>对局房间</h2>
+            </div>
+            <span class="hint">创建房间后，同一服务下打开页面的人可以加入并选择位置。</span>
+          </div>
+          <div class="room-form">
+            <label>
+              <span>玩家名</span>
+              <input id="playerNameInput" type="text" maxlength="24" placeholder="必填" autocomplete="nickname" required />
+            </label>
+            <label>
+              <span>房间名</span>
+              <input id="roomNameInput" type="text" maxlength="24" placeholder="麻将房间" />
+            </label>
+            <button id="createRoomBtn" class="primary" type="button">创建房间</button>
+            <button id="refreshRoomsBtn" class="ghost" type="button">刷新</button>
+          </div>
+          <p id="gameMessage" class="game-message"></p>
+          <div id="roomList" class="room-list"></div>
+        </section>
+        <section id="roomPanel" class="panel room-detail" hidden></section>
+      </section>
+
+      <div id="calculatorWorkspace" class="workspace">
         <div class="main-column">
           <section class="panel hand-panel">
             <div class="section-title">
@@ -72,6 +103,7 @@
                 <small>Round</small>
               </summary>
               <div class="settings">
+                <div id="roundAutoSummary" class="round-auto-summary" hidden></div>
                 <div class="field">
                   <span>和牌方式</span>
                   <div class="segmented">
@@ -117,7 +149,7 @@
         </aside>
       </div>
 
-      <section class="picker">
+      <section id="tileInputArea" class="picker">
         <div class="segmented target-tabs picker-targets">
           <button data-target="hand">手牌</button>
           <button data-target="meld">副露</button>
