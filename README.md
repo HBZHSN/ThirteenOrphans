@@ -44,6 +44,58 @@ python app.py
 http://127.0.0.1:5000/
 ```
 
+## Docker 镜像
+
+构建镜像：
+
+```bash
+docker build -t thirteen-orphans:fc .
+```
+
+本地运行：
+
+```bash
+docker run --rm -p 9000:9000 -e PORT=9000 thirteen-orphans:fc
+```
+
+启动后访问：
+
+```text
+http://127.0.0.1:9000/
+```
+
+镜像默认使用 1 个 gunicorn worker。房间状态保存在当前 Python 进程内，不要把 `GUNICORN_WORKERS`
+调大；如果需要多进程或多实例部署，需要先把房间状态迁到 Redis、数据库等共享存储。
+
+## 部署到阿里云函数计算 FC
+
+先推送镜像到阿里云容器镜像服务 ACR。下面命令里的地域、命名空间、仓库名按你的账号实际替换：
+
+```bash
+export REGION=cn-hangzhou
+export NAMESPACE=your-namespace
+export REPO=thirteen-orphans
+export VERSION=$(date +%Y%m%d%H%M%S)
+export IMAGE=registry.${REGION}.aliyuncs.com/${NAMESPACE}/${REPO}:${VERSION}
+
+docker login --username=your-aliyun-account registry.${REGION}.aliyuncs.com
+docker tag thirteen-orphans:fc "$IMAGE"
+docker push "$IMAGE"
+```
+
+在函数计算 FC 控制台创建函数时选择“容器镜像 / 自定义容器”，镜像地址填 `$IMAGE`。
+容器监听端口填 `9000`；如果控制台里额外配置了环境变量 `PORT`，也保持为 `9000`。
+
+为了适配当前实现，建议先这样配置：
+
+- 最小实例数：`0`，不玩的时候不常驻，按量计费。
+- 最大实例数：`1`，避免同一房间被分到多个实例导致内存状态不一致。
+- 单实例并发：`10` 左右，4 人同时操作够用。
+- 触发器：HTTP 触发器，路径使用默认即可。
+
+注意：FC 缩容、冷启动或实例重建后，内存里的房间会清空；容器内 `records/` 写出的 CSV 也不适合作为长期存储。
+如果要做到“按量启动但对局不丢”，下一步应把房间状态保存到 Redis/Tair、数据库或 OSS/NAS。
+
 ## 使用说明
 
 1. 在底部牌图区域点击牌，录入当前手牌。
