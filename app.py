@@ -68,7 +68,9 @@ class InputError(ValueError):
 
 @app.get("/")
 def index():
-    return send_from_directory(BASE_DIR / "static", "index.html")
+    response = send_from_directory(BASE_DIR / "static", "index.html")
+    response.headers["Content-Disposition"] = "inline; filename=index.html"
+    return response
 
 
 @app.get("/img/<path:filename>")
